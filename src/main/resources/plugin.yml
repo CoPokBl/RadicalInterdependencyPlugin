@@ -1,0 +1,14 @@
+name: RadicalInterdependency
+version: '0.0.1'
+main: net.copokbl.radicalInterdependency.Main
+api-version: '1.21'
+depends: [MinecraftSharedInventory]
+authors: [
+  CoPokBl
+]
+
+commands:
+    radicalinterdependency:
+        description: Main command for RadicalInterdependency plugin.
+        usage: /<command> [subcommand]
+        aliases: [ri]
