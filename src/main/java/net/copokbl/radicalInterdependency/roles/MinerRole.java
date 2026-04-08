@@ -1,13 +1,11 @@
 package net.copokbl.radicalInterdependency.roles;
 
 import net.copokbl.radicalInterdependency.Main;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 
-public class MinerRole implements Role, Listener {
+public class MinerRole implements Role {
 
     @Override
     public String getId() {
@@ -24,11 +22,6 @@ public class MinerRole implements Role, Listener {
         return "You are the only player who can break blocks.";
     }
 
-    @Override
-    public void registerEvents() {
-        Bukkit.getPluginManager().registerEvents(this, Main.getInstance());
-    }
-
     @EventHandler
     public void onBreak(BlockBreakEvent e) {
         if (Main.getInstance().hasRole(e.getPlayer(), getId())) {
@@ -36,7 +29,7 @@ public class MinerRole implements Role, Listener {
         }
 
         e.setCancelled(true);
-        Main.getInstance().alert(e.getPlayer(), "&cYou cannot break blocks because you are not the " + getName() + "!");
+        denyAlert(e.getPlayer(), "break blocks");
     }
 
     @EventHandler
@@ -46,6 +39,6 @@ public class MinerRole implements Role, Listener {
         }
 
         e.setCancelled(true);
-        Main.getInstance().alert(e.getPlayer(), "&cYou cannot pickup liquids because you are not the " + getName() + "!");
+        denyAlert(e.getPlayer(), "pickup liquids");
     }
 }

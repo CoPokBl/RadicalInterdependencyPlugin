@@ -2,6 +2,7 @@ package net.copokbl.radicalInterdependency;
 
 import net.copokbl.radicalInterdependency.commands.RadicalInterdependencyCommand;
 import net.copokbl.radicalInterdependency.roles.*;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -17,11 +18,13 @@ public final class Main extends JavaPlugin {
     private static final Role[] ROLES = {
             new MinerRole(),
             new ClericRole(),
+            new ClericRole(),
             new MercenaryRole(),
             new BuilderRole()
     };
 
     private YamlConfiguration data;
+    private YamlConfiguration config;
 
     @Override
     public void onEnable() {
@@ -29,19 +32,32 @@ public final class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("radicalinterdependency")).setExecutor(new RadicalInterdependencyCommand());
 
         File dataFile = new File(getDataFolder(), "data.yml");
+        File configFile = new File(getDataFolder(), "config.yml");
         if (!dataFile.exists()) {
-            dataFile.getParentFile().mkdirs();
+            boolean ignored = dataFile.getParentFile().mkdirs();
             try {
-                dataFile.createNewFile();
+                boolean ignored2 = dataFile.createNewFile();
+                boolean ignored3 = configFile.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
         data = new YamlConfiguration();
+        config = new YamlConfiguration();
         try {
             data.load(dataFile);
+            config.load(configFile);
         } catch (IOException | InvalidConfigurationException e) {
             throw new RuntimeException(e);
+        }
+
+        if (!config.contains("share-health")) {
+//            config.set("share-health", true);
+            saveConfig();
+        }
+
+        if (config.getBoolean("share-health", false)) {
+            Bukkit.getPluginManager().registerEvents(new ShareStatsHandler(), this);
         }
 
         for (Role role : ROLES) {
@@ -54,6 +70,14 @@ public final class Main extends JavaPlugin {
     public void saveData() {
         try {
             data.save(new File(getDataFolder(), "data.yml"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void saveConfig() {
+        try {
+            config.save(new File(getDataFolder(), "config.yml"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -9,18 +9,19 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class RadicalInterdependencyCommand implements CommandExecutor {
+    private static final String SUBCOMMANDS = "start, reset, roles, alerts";
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (args.length == 0) {
             sender.sendMessage(Utils.t("&aUsage: &6/radicalinterdependency <subcommand>"));
-            sender.sendMessage(Utils.t("&aAvailable subcommands: &6start, reset, roles"));
+            sender.sendMessage(Utils.t("&aAvailable subcommands: &6" + SUBCOMMANDS));
             return true;
         }
 
         switch (args[0].toLowerCase()) {
             case "start": {
-                if (Bukkit.getServer().getOnlinePlayers().size() < Main.getInstance().getRoleCount()) {
+                if (Bukkit.getServer().getOnlinePlayers().isEmpty()) {
                     sender.sendMessage(Utils.t("&cNot enough players online to start Radical Interdependency!"));
                     return true;
                 }
@@ -62,7 +63,7 @@ public class RadicalInterdependencyCommand implements CommandExecutor {
             }
 
             default: {
-                sender.sendMessage(Utils.t("&cUnknown subcommand. Available subcommands: &6start, reset, roles"));
+                sender.sendMessage(Utils.t("&cUnknown subcommand. Available subcommands: &6" + SUBCOMMANDS));
                 return true;
             }
         }

@@ -2,7 +2,7 @@ name: RadicalInterdependency
 version: '0.0.1'
 main: net.copokbl.radicalInterdependency.Main
 api-version: '1.21'
-depends: [MinecraftSharedInventory]
+depends: []
 authors: [
   CoPokBl
 ]

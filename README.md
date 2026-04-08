@@ -6,6 +6,10 @@ what they can do on their own. Each player is given a "role" that lets them do c
 - This game also must be played with a shared inventory plugin running, such as 
 [Minecraft Shared Inventory](https://github.com/Matistan/MinecraftSharedInventory) by Matistan.
 
+> Currently, Matistan's version of shared inventory has a bug which will cause issues.
+> Until [PR #10](https://github.com/Matistan/MinecraftSharedInventory/pull/10) is merged you can use
+> [my fork](https://github.com/CoPokBl/MinecraftSharedInventory).
+
 ## Setup
 - Place a built .jar in the plugins folder.
 - Have everyone join the server.
@@ -20,10 +24,10 @@ what they can do on their own. Each player is given a "role" that lets them do c
 If a role explicitly grants an ability it means that no other player can do that action.
 For example miner explicitly permits breaking blocks, so no other players can break blocks.
 
-| Role Name | Description                          |
-|-----------|--------------------------------------|
-| Miner     | Can break blocks and pickup liquids. |
-| Builder   | Can place blocks and liquids.        |
-| Mercenary | Can damage entities.                 |
+| Role Name | Description                                     |
+|-----------|-------------------------------------------------|
+| Miner     | Can break blocks and pickup liquids.            |
+| Builder   | Can place blocks and liquids.                   |
+| Mercenary | Can damage entities.                            |
 | Cleric    | Can interact with inventories and pickup items. |
 

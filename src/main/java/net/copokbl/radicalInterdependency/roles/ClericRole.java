@@ -1,17 +1,15 @@
 package net.copokbl.radicalInterdependency.roles;
 
 import net.copokbl.radicalInterdependency.Main;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
-public class ClericRole implements Role, Listener {
+public class ClericRole implements Role {
 
     @Override
     public String getId() {
@@ -28,11 +26,6 @@ public class ClericRole implements Role, Listener {
         return "You are the only player who can use inventories.";
     }
 
-    @Override
-    public void registerEvents() {
-        Bukkit.getPluginManager().registerEvents(this, Main.getInstance());
-    }
-
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlace(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) {
@@ -44,7 +37,7 @@ public class ClericRole implements Role, Listener {
         }
 
         e.setCancelled(true);
-        Main.getInstance().alert(p, "&cYou cannot interact with inventories because you are not the " + getName() + "!");
+        denyAlert(p, "interact with inventories");
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -54,7 +47,7 @@ public class ClericRole implements Role, Listener {
         }
 
         e.setCancelled(true);
-        Main.getInstance().alert(e.getPlayer(), "&cYou cannot drop items because you are not the " + getName() + "!");
+        denyAlert(e.getPlayer(), "drop items");
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -64,7 +57,7 @@ public class ClericRole implements Role, Listener {
         }
 
         e.setCancelled(true);
-        Main.getInstance().alert(e.getPlayer(), "&cYou cannot swap items because you are not the " + getName() + "!");
+        denyAlert(e.getPlayer(), "swap items");
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -78,6 +71,6 @@ public class ClericRole implements Role, Listener {
         }
 
         e.setCancelled(true);
-        Main.getInstance().alert(p, "&cYou cannot pick up items because you are not the " + getName() + "!");
+        denyAlert(p, "pick up items");
     }
 }
