@@ -6,10 +6,50 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-public class RadicalInterdependencyCommand implements CommandExecutor {
-    private static final String SUBCOMMANDS = "start, reset, roles, alerts";
+import java.util.ArrayList;
+import java.util.List;
+
+public class RadicalInterdependencyCommand implements CommandExecutor, TabCompleter {
+    private static final String SUBCOMMANDS = "start, reset, roles, alerts, assign";
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
+        List<String> completions = new ArrayList<>();
+        if (args.length == 1) {
+            for (String sub : new String[]{"start", "reset", "roles", "alerts", "assign"}) {
+                if (sub.startsWith(args[0].toLowerCase())) {
+                    completions.add(sub);
+                }
+            }
+        } else if (args.length >= 2 && args[0].equalsIgnoreCase("start")) {
+            String partial = args[args.length - 1].toLowerCase();
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (p.getName().toLowerCase().startsWith(partial)) {
+                    completions.add(p.getName());
+                }
+            }
+        } else if (args[0].equalsIgnoreCase("assign")) {
+            if (args.length == 2) {
+                String partial = args[1].toLowerCase();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (p.getName().toLowerCase().startsWith(partial)) {
+                        completions.add(p.getName());
+                    }
+                }
+            } else if (args.length == 3) {
+                String partial = args[2].toLowerCase();
+                for (net.copokbl.radicalInterdependency.roles.Role role : Main.getInstance().getAllRoles()) {
+                    if (role.getId().toLowerCase().startsWith(partial)) {
+                        completions.add(role.getId());
+                    }
+                }
+            }
+        }
+        return completions;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -21,13 +61,29 @@ public class RadicalInterdependencyCommand implements CommandExecutor {
 
         switch (args[0].toLowerCase()) {
             case "start": {
-                if (Bukkit.getServer().getOnlinePlayers().isEmpty()) {
-                    sender.sendMessage(Utils.t("&cNot enough players online to start Radical Interdependency!"));
+                List<Player> players;
+
+                if (args.length > 1) {
+                    players = new ArrayList<>();
+                    for (int i = 1; i < args.length; i++) {
+                        Player p = Bukkit.getPlayer(args[i]);
+                        if (p == null || !p.isOnline()) {
+                            sender.sendMessage(Utils.t("&cPlayer not found: &6" + args[i]));
+                            return true;
+                        }
+                        players.add(p);
+                    }
+                } else {
+                    players = new ArrayList<>(Bukkit.getOnlinePlayers());
+                }
+
+                if (players.isEmpty()) {
+                    sender.sendMessage(Utils.t("&cNot enough players to start Radical Interdependency!"));
                     return true;
                 }
 
-                Main.getInstance().start();
-                sender.sendMessage(Utils.t("&aRadical Interdependency has been started!"));
+                Main.getInstance().start(players);
+                sender.sendMessage(Utils.t("&aRadical Interdependency has been started for &6" + players.size() + "&a player(s)!"));
                 break;
             }
 
@@ -47,6 +103,29 @@ public class RadicalInterdependencyCommand implements CommandExecutor {
                 for (String roleId : Main.getInstance().getRoles(p)) {
                     sender.sendMessage(Utils.t("&a- &6" + roleId));
                 }
+                break;
+            }
+
+            case "assign": {
+                if (args.length < 3) {
+                    sender.sendMessage(Utils.t("&aUsage: &6/ri assign <player> <role>"));
+                    return true;
+                }
+
+                Player target = Bukkit.getPlayer(args[1]);
+                if (target == null || !target.isOnline()) {
+                    sender.sendMessage(Utils.t("&cPlayer not found: &6" + args[1]));
+                    return true;
+                }
+
+                net.copokbl.radicalInterdependency.roles.Role role = Main.getInstance().getRole(args[2]);
+                if (role == null) {
+                    sender.sendMessage(Utils.t("&cUnknown role: &6" + args[2]));
+                    return true;
+                }
+
+                Main.getInstance().assignRole(target, role);
+                sender.sendMessage(Utils.t("&aAssigned &6" + role.getName() + "&a to &6" + target.getName() + "&a!"));
                 break;
             }
 
