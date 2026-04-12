@@ -2,6 +2,7 @@ package net.copokbl.radicalInterdependency.commands;
 
 import net.copokbl.radicalInterdependency.Main;
 import net.copokbl.radicalInterdependency.Utils;
+import net.copokbl.radicalInterdependency.roles.Role;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,13 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RadicalInterdependencyCommand implements CommandExecutor, TabCompleter {
-    private static final String SUBCOMMANDS = "start, reset, roles, alerts, assign";
+    private static final String SUBCOMMANDS = "start, reset, roles, alerts, assign, unassign";
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
         if (args.length == 1) {
-            for (String sub : new String[]{"start", "reset", "roles", "alerts", "assign"}) {
+            for (String sub : new String[]{"start", "reset", "roles", "alerts", "assign", "unassign"}) {
                 if (sub.startsWith(args[0].toLowerCase())) {
                     completions.add(sub);
                 }
@@ -31,7 +32,7 @@ public class RadicalInterdependencyCommand implements CommandExecutor, TabComple
                     completions.add(p.getName());
                 }
             }
-        } else if (args[0].equalsIgnoreCase("assign")) {
+        } else if (args[0].equalsIgnoreCase("assign") || args[0].equalsIgnoreCase("unassign")) {
             if (args.length == 2) {
                 String partial = args[1].toLowerCase();
                 for (Player p : Bukkit.getOnlinePlayers()) {
@@ -126,6 +127,33 @@ public class RadicalInterdependencyCommand implements CommandExecutor, TabComple
 
                 Main.getInstance().assignRole(target, role);
                 sender.sendMessage(Utils.t("&aAssigned &6" + role.getName() + "&a to &6" + target.getName() + "&a!"));
+                break;
+            }
+
+            case "unassign": {
+                if (args.length < 3) {
+                    sender.sendMessage(Utils.t("&aUsage: &6/ri unassign <player> <role>"));
+                    return true;
+                }
+
+                Player target = Bukkit.getPlayer(args[1]);
+                if (target == null || !target.isOnline()) {
+                    sender.sendMessage(Utils.t("&cPlayer not found: &6" + args[1]));
+                    return true;
+                }
+
+                Role role = Main.getInstance().getRole(args[2]);
+                if (role == null) {
+                    sender.sendMessage(Utils.t("&cUnknown role: &6" + args[2]));
+                    return true;
+                }
+
+                if (!Main.getInstance().removeRole(target, role)) {
+                    sender.sendMessage(Utils.t("&c" + target.getName() + " does not have the role &6" + role.getName() + "&c!"));
+                    return true;
+                }
+
+                sender.sendMessage(Utils.t("&aRemoved &6" + role.getName() + "&a from &6" + target.getName() + "&a!"));
                 break;
             }
 

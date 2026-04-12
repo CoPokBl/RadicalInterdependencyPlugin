@@ -93,6 +93,16 @@ public final class Main extends JavaPlugin {
         return roles.length > 0 && Arrays.asList(roles).contains(role);
     }
 
+    public boolean removeRole(Player p, Role role) {
+        List<String> roles = new ArrayList<>(Arrays.stream(getRoles(p)).toList());
+        if (!roles.remove(role.getId())) return false;
+        data.set("players." + p.getUniqueId() + ".roles", roles);
+        saveData();
+
+        p.sendMessage(Utils.t("&cYour role &6" + role.getName() + "&c has been removed."));
+        return true;
+    }
+
     public void assignRole(Player p, Role role) {
         List<String> roles = new ArrayList<>(Arrays.stream(getRoles(p)).toList());
         roles.add(role.getId());
